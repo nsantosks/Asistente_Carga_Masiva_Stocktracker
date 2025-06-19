@@ -2,7 +2,7 @@
 
 Este proyecto es una aplicación web creada con Google Apps Script que utiliza la API de Google Gemini para procesar listas de productos en texto plano y transformarlas en tres archivos CSV estructurados. Estos archivos están diseñados para facilitar la carga masiva de nuevos productos, sus transacciones de inventario inicial y los detalles de dicho inventario en el sistema de control y gestión de inventarios **Stocktracker**.
 
-![Captura de pantalla de la aplicación]([https://i.imgur.com/kYqVv2C.png](https://i.imgur.com/Stdyz4k.jpeg))
+![Captura de pantalla de la aplicación](https://i.imgur.com/Stdyz4k.jpeg)
 
 ## ✨ Características Principales
 
