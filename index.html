@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <?!= include('Stylesheet'); ?>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-circle">
+                <img src="https://i.imgur.com/Cq91Kmj.png" alt="Logo Stocktracker">
+            </div>
+            <div class="header-text">
+                <h1>Asistente de Carga Masiva de Productos</h1>
+                <p>Herramienta de IA que te ayuda a estandarizar y limpiar y crear el archivo CSV necesario para la carga masiva de tu listas de productos usado en el sistema de control y gestión de inventarios Stocktracker.</p>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div id="step1" class="step-card">
+                <div class="step-header">
+                    <span class="step-number">1</span>
+                    <span>Parámetros Opcionales</span>
+                </div>
+                <div class="step-content">
+                    <p>Define los valores por defecto para todo el lote. <strong>Llena los campos opcionales para establecer el valor predeterminado para el lote de productos que deseas procesar.</strong></p>
+                    <div class="config-grid">
+                        <div><label for="stock-minimo">Stock Mínimo (Opcional)</label><input type="text" id="stock-minimo" placeholder="Defecto: 1"></div>
+                        <div><label for="id-proveedor">ID Proveedor (Opcional)</label><input type="text" id="id-proveedor" placeholder="Ej: PROV-007"></div>
+                        <div><label for="categoria">Categoría (Opcional)</label><input type="text" id="categoria" placeholder="Forzar categoría, ej: Correas y Poleas"></div>
+                        <div><label for="subcategoria">Subcategoría (Opcional)</label><input type="text" id="subcategoria" placeholder="Forzar subcat., ej: Correas"></div>
+                        <div><label for="unidad-medida">Unidad de Medida (Opcional)</label><input type="text" id="unidad-medida" placeholder="Forzar unidad, ej: UND"></div>
+                        <div><label for="ubicacion">Ubicación (Opcional)</label><input type="text" id="ubicacion" placeholder="Forzar ubicación, ej: A-01-B"></div>
+                    </div>
+                    <div class="config-note">
+                        <strong>Nota:</strong> Si dejas un campo opcional en blanco, el asistente de IA asignará un valor de forma inteligente. Si escribes algo, ese valor se usará para TODOS los productos procesados en este lote.
+                    </div>
+                    <div class="button-container">
+                        <button class="btn btn-green" onclick="advanceToStep(2)">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+            <div id="step2" class="step-card">
+                <div class="step-header">
+                    <span class="step-number">2</span>
+                    <span>Listado de Productos</span>
+                </div>
+                <div class="step-content">
+                    <label for="raw-data">Pega aquí los datos en crudo (un artículo por línea)</label>
+                    <textarea id="raw-data" placeholder="A3421 Kit de Afinación para Tsuru III 16V..."></textarea>
+                    <div class="input-note">
+                        <span id="line-counter">0 / 25 líneas</span>
+                        <span>Límite de 25 artículos por lote.</span>
+                        <a href="https://wa.me/584128672845" target="_blank" class="support-btn">Contactar Soporte</a>
+                    </div>
+                    <div class="button-container">
+                        <button id="process-btn" class="btn btn-blue" onclick="startProcessing()">Procesar Datos</button>
+                    </div>
+                </div>
+            </div>
+            <div id="loader" class="loader"></div>
+            <div id="step3" class="step-card">
+                <div class="step-header">
+                    <span class="step-number">3</span>
+                    <span>Previsualización del Resultado</span>
+                </div>
+                <div class="step-content">
+                    <div id="result-table-container">
+                        <p class="placeholder">El resultado se mostrará aquí después del procesamiento.</p>
+                    </div>
+                    <div id="result-actions">
+                        <div class="action-group">
+                            <button id="download-products-btn" class="btn btn-green" onclick="downloadCSV('productos')">Descargar Listado de Productos</button>
+                            <button id="download-transaction-btn" class="btn btn-blue" onclick="downloadCSV('transaccion')">Descargar Transacción</button>
+                            <button id="download-inventory-btn" class="btn btn-green" onclick="downloadCSV('inventario')">Descargar Inventario Inicial</button>
+                        </div>
+                        <div class="action-group">
+                           <button id="reset-btn" class="btn btn-orange" onclick="resetForm()">Realizar Nuevo Procesamiento</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-300 py-10 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-start">
+            <div class="flex flex-col items-center md:items-start text-center md:text-left">
+                <h3 class="text-2xl font-semibold text-white mb-2">Gammaliel Analytics | Stocktracker</h3>
+                <p class="text-sm">© <span id="copyright-year"></span> Gammaliel Analytics. Todos los derechos reservados.</p>
+                <p class="text-sm mt-1 text-gray-400">Impulsando la inteligencia de negocios con datos.</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <h3 class="text-xl font-semibold text-white mb-4">Conéctate</h3>
+                <div class="flex space-x-6">
+                    <a href="https://www.linkedin.com/in/ingnsantos/" target="_blank" rel="noopener noreferrer" class="social-icon-link text-gray-400 hover:text-blue-500 text-2xl"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.facebook.com/AllExcelUP/" target="_blank" rel="noopener noreferrer" class="social-icon-link text-gray-400 hover:text-blue-600 text-2xl"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.instagram.com/allexcelup/" target="_blank" rel="noopener noreferrer" class="social-icon-link text-gray-400 hover:text-pink-500 text-2xl"><i class="fab fa-instagram"></i></a>
+                    <a href="https://sites.google.com/view/allexcelup/inicio" target="_blank" rel="noopener noreferrer" class="social-icon-link text-gray-400 hover:text-green-500 text-2xl"><i class="fas fa-globe"></i></a>
+                    <a href="https://wa.me/+584128672845" target="_blank" rel="noopener noreferrer" class="social-icon-link text-gray-400 hover:text-green-400 text-2xl"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="flex flex-col items-center md:items-end text-center md:text-right">
+                <div class="flex items-center justify-center md:justify-end mb-3">
+                    <img src="https://i.imgur.com/MVA6g1p.jpeg" alt="Imagen de perfil de Ing. Nestor Santos" class="w-16 h-16 rounded-full border-2 border-blue-500 shadow-md object-cover" onerror="this.onerror=null; this.src='https://placehold.co/64x64/cccccc/000000?text=NS';">
+                    <div class="ml-4">
+                        <a href="https://www.linkedin.com/in/ingnsantos/" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 font-medium text-lg">Ing. Nelson Santos</a>
+                        <p class="text-sm text-gray-400 mt-1">Desarrollador</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 max-w-xs md:max-w-none">Desarrollador Microsoft Power BI | Inteligencia de Negocios | Analista de Datos | Consultoría de Procesos de Negocio</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3')];
+        const processBtn = document.getElementById('process-btn');
+        const loader = document.getElementById('loader');
+        const rawDataEl = document.getElementById('raw-data');
+        const lineCounterEl = document.getElementById('line-counter');
+        const tableContainerEl = document.getElementById('result-table-container');
+        const resultActionsEl = document.getElementById('result-actions');
+        const stockMinimoEl = document.getElementById('stock-minimo');
+        const idProveedorEl = document.getElementById('id-proveedor');
+        const categoriaEl = document.getElementById('categoria');
+        const subcategoriaEl = document.getElementById('subcategoria');
+        const unidadMedidaEl = document.getElementById('unidad-medida');
+        const ubicacionEl = document.getElementById('ubicacion');
+        
+        const LINE_LIMIT = 25;
+        let productosCsvContent = '';
+        let inventarioCsvContent = '';
+        let transaccionCsvContent = '';
+        let maxAllowedStep = 1;
+
+        function advanceToStep(stepNumber) { if (stepNumber > maxAllowedStep) { maxAllowedStep = stepNumber; } goToStep(stepNumber); }
+        function goToStep(targetStepNumber) {
+            if (targetStepNumber > maxAllowedStep) return;
+            steps.forEach((step, index) => {
+                const stepNumber = index + 1;
+                const header = step.querySelector('.step-header');
+                if (stepNumber === targetStepNumber) { step.classList.add('active'); step.classList.remove('collapsed', 'completed'); } 
+                else { step.classList.remove('active'); step.classList.add('collapsed'); if (stepNumber < targetStepNumber) { step.classList.add('completed'); } else { step.classList.remove('completed'); } }
+                if (stepNumber < maxAllowedStep) { header.classList.add('clickable'); header.onclick = () => goToStep(stepNumber); } 
+                else { header.classList.remove('clickable'); header.onclick = null; }
+            });
+        }
+        
+        function updateProcessButtonState() { processBtn.disabled = rawDataEl.value.trim() === ''; }
+        rawDataEl.addEventListener('input', () => {
+            let lines = rawDataEl.value.split('\n');
+            if (lines.length > LINE_LIMIT) { lines = lines.slice(0, LINE_LIMIT); rawDataEl.value = lines.join('\n'); }
+            lineCounterEl.textContent = `${lines.length} / ${LINE_LIMIT} líneas`;
+            lineCounterEl.classList.toggle('limit-reached', lines.length >= LINE_LIMIT);
+            updateProcessButtonState();
+        });
+        
+        function startProcessing() {
+            processBtn.disabled = true; processBtn.innerText = 'Procesando...';
+            loader.style.display = 'block';
+            tableContainerEl.innerHTML = ''; resultActionsEl.style.display = 'none';
+            productosCsvContent = ''; inventarioCsvContent = ''; transaccionCsvContent = '';
+            const stockMinimo = stockMinimoEl.value.trim(); const idProveedor = idProveedorEl.value.trim(); const categoria = categoriaEl.value.trim(); const subcategoria = subcategoriaEl.value.trim(); const unidadMedida = unidadMedidaEl.value.trim(); const ubicacion = ubicacionEl.value.trim();
+            google.script.run.withSuccessHandler(onSuccess).withFailureHandler(onFailure).processDataWithAI(rawDataEl.value, stockMinimo, categoria, subcategoria, unidadMedida, idProveedor, ubicacion);
+        }
+
+        function onSuccess(csvData) {
+            loader.style.display = 'none'; processBtn.innerText = 'Procesar Datos'; updateProcessButtonState();
+            
+            productosCsvContent = csvData.productosCSV;
+            inventarioCsvContent = csvData.inventarioCSV;
+            transaccionCsvContent = csvData.transaccionCSV;
+            
+            buildTable(productosCsvContent);
+            advanceToStep(3);
+            resultActionsEl.style.display = 'flex';
+        }
+
+        function onFailure(error) {
+            loader.style.display = 'none';
+            const errorMessage = "Servicio no disponible en este momento, intente más tarde o comuniquese con el desarrollador: consulting@gammalielanalitycs.com";
+            tableContainerEl.innerHTML = `<p class="error-message">${errorMessage}</p>`;
+            resultActionsEl.style.display = 'flex';
+            processBtn.innerText = 'Procesar Datos'; updateProcessButtonState();
+            console.error("Error devuelto por el servidor:", error.message);
+            advanceToStep(3);
+        }
+
+        function buildTable(csvString) {
+            const rows = csvString.trim().split('\n');
+            if (rows.length < 2) { tableContainerEl.innerHTML = '<p class="error-message">La IA no devolvió datos válidos.</p>'; return; }
+            const headers = rows.shift().split(',');
+            const dataRows = rows.map(row => row.split(','));
+            let tableHTML = '<table><thead><tr>';
+            headers.forEach(header => { tableHTML += `<th>${header.trim()}</th>`; });
+            tableHTML += '</tr></thead><tbody>';
+            dataRows.forEach(row => {
+                tableHTML += '<tr>';
+                row.forEach(cell => { tableHTML += `<td>${cell.trim()}</td>`; });
+                tableHTML += '</tr>';
+            });
+            tableHTML += '</tbody></table>';
+            tableContainerEl.innerHTML = tableHTML;
+        }
+
+        function downloadCSV(type) {
+            let content = '';
+            let filename = '';
+            const date = new Date();
+            const dateStr = date.toISOString().slice(0, 10);
+            
+            let transactionId = '';
+            if (inventarioCsvContent) {
+                const firstLine = inventarioCsvContent.split('\n')[1]; // Tomar la primera línea de datos
+                if(firstLine) {
+                  transactionId = firstLine.split(',')[1]; // El ID de transacción es la segunda columna
+                }
+            }
+
+            switch(type) {
+                case 'productos':
+                    content = productosCsvContent;
+                    filename = `productos_${dateStr}.csv`;
+                    break;
+                case 'transaccion':
+                    content = transaccionCsvContent;
+                    filename = `transaccion_${transactionId || 'default'}.csv`;
+                    break;
+                case 'inventario':
+                    content = inventarioCsvContent;
+                    filename = `inventario_inicial_${transactionId || 'default'}.csv`;
+                    break;
+            }
+
+            if (!content) { alert('No hay contenido para descargar para este tipo de archivo.'); return; }
+            
+            const bom = '\uFEFF';
+            const blob = new Blob([bom + content], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function resetForm() {
+            rawDataEl.value = ''; stockMinimoEl.value = ''; idProveedorEl.value = ''; categoriaEl.value = ''; subcategoriaEl.value = ''; unidadMedidaEl.value = ''; ubicacionEl.value = '';
+            tableContainerEl.innerHTML = '<p class="placeholder">El resultado se mostrará aquí después del procesamiento.</p>';
+            productosCsvContent = ''; inventarioCsvContent = ''; transaccionCsvContent = '';
+            resultActionsEl.style.display = 'none';
+            lineCounterEl.textContent = `0 / ${LINE_LIMIT} líneas`;
+            lineCounterEl.classList.remove('limit-reached');
+            maxAllowedStep = 1;
+            goToStep(1);
+            updateProcessButtonState();
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            resetForm();
+            document.getElementById('copyright-year').textContent = new Date().getFullYear();
+        });
+    </script>
+</body>
+</html>
