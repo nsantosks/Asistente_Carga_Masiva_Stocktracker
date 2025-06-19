@@ -92,17 +92,11 @@ Una vez que la IA termina su trabajo, esta sección se activará automáticament
 
 La aplicación produce los siguientes tres archivos, diseñados para ser importados en orden:
 
-1. **`productos_YYYY-MM-DD.csv`**
-   - **Propósito:** Crear las fichas de los nuevos productos en el sistema.
-   - **Contenido:** `ID_Producto`, `Nombre_Producto`, `Descripcion`, `Categoria`, etc.
-
-2. **`transaccion_II_YYYYMMDD_HHMM.csv`**
-   - **Propósito:** Crear el registro maestro de la transacción de ajuste de inventario.
-   - **Contenido:** `ID_Transaccion`, `Fecha_Hora`, `Tipo_Transaccion`, `Notas_Transaccion`, etc.
-
-3. **`inventario_inicial_II_YYYYMMDD_HHMM.csv`**
-   - **Propósito:** Cargar las líneas de detalle de la transacción, asignando el stock a cada producto.
-   - **Contenido:** `ID_Transaccion_Detail`, `ID_Transaccion`, `ID_Producto`, `Cantidad`.
+| Archivo | Propósito | Contenido Principal |
+|:-----------------------------------|:----------------------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------|
+| **`productos_YYYY-MM-DD.csv`** | Crear las fichas de los nuevos productos en el sistema.                           | `ID_Producto`, `Nombre_Producto`, `Descripcion`, `Categoria`, etc.                                 |
+| **`transaccion_II_YYYYMMDD_HHMM.csv`** | Crear el registro maestro de la transacción de ajuste de inventario.           | `ID_Transaccion`, `Fecha_Hora`, `Tipo_Transaccion`, `Notas_Transaccion`, etc.                      |
+| **`inventario_inicial_II_YYYYMMDD_HHMM.csv`** | Cargar las líneas de detalle de la transacción, asignando el stock a cada producto. | `ID_Transaccion_Detail`, `ID_Transaccion`, `ID_Producto`, `Cantidad`                             |
 
 ## 🛠️ Tecnologías Utilizadas
 
